@@ -19,7 +19,7 @@ Write-Output "MACHINE_SID=$machineSid"
 
 $s = New-Object DirectoryServices.DirectorySearcher($root)
 $s.PageSize = 500
-$s.Filter = "(&(|(adminCount=1)(sAMAccountName=Domain Admins)(sAMAccountName=krbtgt))(nTSecurityDescriptor=*))"
+$s.Filter = "(&(|(sAMAccountName=Domain Admins)(sAMAccountName=krbtgt))(nTSecurityDescriptor=*))"
 $s.PropertiesToLoad.AddRange(@("sAMAccountName", "distinguishedName", "nTSecurityDescriptor"))
 
 foreach ($entry in $s.FindAll()) {
